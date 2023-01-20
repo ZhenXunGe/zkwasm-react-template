@@ -1,71 +1,80 @@
-import axios from "axios";
-import FormData from "form-data";
-class RestEndpoint {
-  constructor(
-    public endpoint: string,
-    public username: string,
-    public useraddress: string
-  ) {}
-  async prepareRequest(
-    method: "GET" | "POST",
-    url: string,
-    body: JSON | FormData | null,
-    headers?: {
-      [key: string]: string;
-    }
-  ) {
-    if (method === "GET") {
-      console.log(this.endpoint + url);
-      try {
-        let response = await axios.get(
-          this.endpoint + url,
-          body ? { params: body! } : {}
-        );
-        return response.data;
-      } catch (e: any) {
-        console.error(e);
-        throw Error("RestEndpointGetFailure");
-      }
-    } else {
-      try {
-        let response = await axios.post(
-          this.endpoint + url,
-          body ? body! : {},
-          {
-            headers: {
-              ...headers,
-            },
-          }
-        );
-        return response.data;
-      } catch (e: any) {
-        console.log(e);
-        throw Error("RestEndpointPostFailure");
-      }
-    }
-  }
+import { ZkWasmServiceHelper } from "zkwasm-service-helper";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState, store } from "../app/store";
 
-  async getJSONResponse(json: any) {
-    if (json["success"] !== true) {
-      console.error(json);
-      throw new Error("RequestError:" + json["error"]);
-    }
-    return json["result"];
-  }
-
-  async invokeRequest(
-    method: "GET" | "POST",
-    url: string,
-    body: JSON | FormData | null,
-    headers?: {
-      [key: string]: string;
-    }
-  ) {
-    let response = await this.prepareRequest(method, url, body, headers);
-    return await this.getJSONResponse(response);
-  }
+export const resturl = "https://zkwasm-explorer.delphinuslab.com:8090";
+export const zkwasmHelper = new ZkWasmServiceHelper(resturl, "", "");
+export interface Endpoint {
+  url: string;
+  nickname: string;
 }
 
-export const resturl = "http://127.0.0.1:8080";
+export const storageKey = "customURLs";
+export const defaultEndpoint: Endpoint = {
+  url: resturl,
+  nickname: "Default",
+};
+function customEndpoints() {
+  //Get custom endpoint array from local storage
+  let endpoints = localStorage.getItem(storageKey);
+  if (endpoints) {
+    return JSON.parse(endpoints) as Endpoint[];
+  }
+  return [];
+}
 
-export const endpoint = new RestEndpoint(resturl, "test", "test");
+function getLastUsedEndpoint() {
+  let endpoint = localStorage.getItem("lastUsedEndpoint");
+  if (endpoint) {
+    console.log("last used endpoint: " + endpoint + "");
+    return JSON.parse(endpoint) as Endpoint;
+  }
+  return defaultEndpoint;
+}
+
+const initialState: {
+  zkWasmServiceHelper: ZkWasmServiceHelper;
+  currentEndpoint: Endpoint;
+  endpointList: Endpoint[];
+} = {
+  zkWasmServiceHelper: new ZkWasmServiceHelper(
+    getLastUsedEndpoint().url,
+    "",
+    ""
+  ),
+  currentEndpoint: getLastUsedEndpoint(),
+  endpointList: [...customEndpoints()],
+};
+
+export const endpointSlice = createSlice({
+  name: "endpoint",
+  initialState,
+  reducers: {
+    updateCurrentEndpoint: (state, d: PayloadAction<Endpoint>) => {
+      //add updated array to local storage
+      localStorage.setItem("lastUsedEndpoint", JSON.stringify(d.payload));
+      state.currentEndpoint = d.payload;
+      state.zkWasmServiceHelper = new ZkWasmServiceHelper(
+        d.payload.url,
+        "",
+        ""
+      );
+    },
+    setEndpointList: (state, d) => {
+      //add updated array to local storage
+      localStorage.setItem(storageKey, JSON.stringify(d.payload));
+      state.endpointList = d.payload;
+    },
+  },
+});
+
+export const { updateCurrentEndpoint, setEndpointList } = endpointSlice.actions;
+
+export const selectEndpointList = (state: RootState) =>
+  state.endpoint.endpointList;
+export const selectCurrentEndpoint = (state: RootState) =>
+  state.endpoint.currentEndpoint;
+export const selectZkWasmServiceHelper = (state: RootState) =>
+  state.endpoint.zkWasmServiceHelper;
+
+export default endpointSlice.reducer;
