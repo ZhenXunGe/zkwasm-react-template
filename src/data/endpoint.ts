@@ -2,7 +2,7 @@ import { ZkWasmServiceHelper } from "zkwasm-service-helper";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState, store } from "../app/store";
 
-export const resturl = "https://zkwasm-explorer.delphinuslab.com:8090";
+export const resturl = "https://rpc.zkwasmhub.com:8090";
 export const zkwasmHelper = new ZkWasmServiceHelper(resturl, "", "");
 export interface Endpoint {
   url: string;
