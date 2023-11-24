@@ -23,6 +23,8 @@ import { MainNavBar } from "../components/Nav";
 import { State, ActionType } from "../types/game";
 import { ModalOptions } from "../types/layout";
 
+import * as rustlib from "rustlib/web/pkg";
+
 const initializeGame = async () => {
   await initGameInstance();
   return gameInstance;

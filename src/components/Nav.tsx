@@ -1,7 +1,7 @@
 import React, { createRef, useState, useEffect, useRef } from "react";
 import "./style.scss";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
-import { loginL1AccountAsync, selectL1Account } from "../data/accountSlice";
+import { loginL1AccountAsync, selectL1Account, loginL2AccountAsync, selectL2Account } from "../data/accountSlice";
 import { addressAbbreviation } from "../utils/address";
 import {
   Button,
@@ -27,6 +27,7 @@ export function MainNavBar(props: IProps) {
   const dispatch = useAppDispatch();
 
   let account = useAppSelector(selectL1Account);
+  let l2account = useAppSelector(selectL2Account);
 
   useEffect(() => {
     dispatch(loginL1AccountAsync());
@@ -53,17 +54,28 @@ export function MainNavBar(props: IProps) {
 
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <div className="divider"></div>
             {account && (
               <>
+                <div className="divider"></div>
                 <Navbar.Text>
                   <div>Account</div>
                   <div>{addressAbbreviation(account.address, 4)}</div>
                 </Navbar.Text>
               </>
             )}
+            {l2account && (
+              <>
+                <div className="divider"></div>
+                <Navbar.Text>
+                  <div>Processing Key</div>
+                  <div>{l2account}</div>
+                </Navbar.Text>
+              </>
+            )}
+
             {!account && (
               <>
+                <div className="divider"></div>
                 <Nav.Link
                   onClick={() => dispatch(loginL1AccountAsync())}
                   className="px-2 my-2 py-0"
@@ -72,6 +84,18 @@ export function MainNavBar(props: IProps) {
                 </Nav.Link>
               </>
             )}
+            {account && !l2account && (
+              <>
+                <div className="divider"></div>
+                <Nav.Link
+                  onClick={() => dispatch(loginL2AccountAsync(account!))}
+                  className="px-2 my-2 py-0"
+                >
+                  Derive Processing Key
+                </Nav.Link>
+              </>
+            )}
+
           </Nav>
         </Navbar.Collapse>
       </Container>

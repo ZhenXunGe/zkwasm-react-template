@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { DelphinusWeb3, withBrowerWeb3 } from "web3subscriber/src/client";
+import { signMessage } from "../utils/address";
 
 export interface L1AccountInfo {
   address: string;
@@ -14,9 +15,15 @@ async function loginL1Account() {
   });
 }
 
+async function loginL2Account(address: string ) {
+  let str:string = await signMessage(address);
+  return str.substring(0,34);
+}
+
 
 export interface AccountState {
   l1Account?: L1AccountInfo;
+  l2account?: string;
   status: 'Loading' | 'Ready';
 }
 
@@ -37,7 +44,16 @@ export const loginL1AccountAsync = createAsyncThunk(
   'acccount/fetchAccount',
   async (thunkApi) => {
     let account = await loginL1Account();
+    let l2account = await loginL2Account(account.address);
     return account;
+  }
+);
+
+export const loginL2AccountAsync = createAsyncThunk(
+  'acccount/deriveL2Account',
+  async (l1account:L1AccountInfo,  thunkApi) => {
+    let l2account = await loginL2Account(l1account.address);
+    return l2account;
   }
 );
 
@@ -59,11 +75,19 @@ export const accountSlice = createSlice({
         console.log(c);
         state.l1Account = c.payload;
       })
-
+      .addCase(loginL2AccountAsync.pending, (state) => {
+        state.status = 'Loading';
+      })
+      .addCase(loginL2AccountAsync.fulfilled, (state, c) => {
+        state.status = 'Ready';
+        console.log(c);
+        state.l2account = c.payload;
+      })
   },
 });
 
 export const selectL1Account = <T extends State>(state: T) => state.account.l1Account;
+export const selectL2Account = <T extends State>(state: T) => state.account.l2account;
 export const selectLoginStatus = <T extends State>(state: T) => state.account.status;
 
 export default accountSlice.reducer;

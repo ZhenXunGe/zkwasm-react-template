@@ -27,7 +27,8 @@
     "servicehelper": "git+https://github.com/DelphinusLab/service-helper.git",
     "wait-on": "^6.0.1",
     "web3subscriber": "git+https://github.com/DelphinusLab/delphinus-web3subscriber.git",
-    "zkwasm-service-helper": "git+https://github.com/DelphinusLab/zkWasm-service-helper.git"
+    "zkwasm-service-helper": "git+https://github.com/DelphinusLab/zkWasm-service-helper.git",
+    "rustlib": "file:./rustlib"
   },
   "scripts": {
     "start": "react-app-rewired start",
