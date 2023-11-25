@@ -1,50 +1,62 @@
-use wasm_bindgen::prelude::*;
-use zkwasm_rust_sdk::{
-    wasm_input,
-    require,
-    //wasm_dbg,
-};
+pub const DEPOSIT:u8 = 0x0;
+pub const WITHDRAW:u8 = 0x1;
 
-
-extern crate num;
-
-pub mod utils;
-
-// the only game state
-static mut POSITION: i32 = 101;
-
-
-// query state
-#[wasm_bindgen]
-pub fn get_position() -> i32{
-    unsafe { POSITION }
+pub struct TxInfo {
+    pub opinfo: u64,
+    pub account_index: u32,
+    pub object_index: u32,
+    pub args: [u64; 8],
 }
 
-// update state via command
-#[wasm_bindgen]
-pub fn perform_command(command: i32) {
-    if command == 0 {
-        unsafe { POSITION -= 1 }
-    } else {
-        unsafe { POSITION += 1 }
-    }
+pub struct DepositInfo {
+    pub opinfo: u64,
+    pub account_index: u32,
+    pub object_index: u32,
+    pub amount: [u64; 4],
+    pub sender: [u64; 4],
 }
 
-#[wasm_bindgen]
-pub fn zkmain() {
-    unsafe {
-        let result = wasm_input(1);
-        let input_len = wasm_input(1);
-        let mut cursor = 0;
-        
-        while cursor < input_len {
-            let command = wasm_input(0);
-            perform_command(command as i32);
-            cursor += 1;
+pub struct WithdrawInfo {
+    pub opinfo: u64,
+    pub account_index: u32,
+    pub object_index: u32,
+    pub amount: [u64; 4],
+    pub sender: [u64; 4],
+}
+
+pub fn read_tx_info<'a, T>(data: &'a [u64; 10]) -> &'a T {
+    unsafe { std::mem::transmute(data) }
+}
+
+impl DepositInfo {
+    pub fn new(nounce: u64, account_index: u32, object_index: u32, amount: [u64;4], sender: [u64; 4]) -> Self {
+        DepositInfo {
+            opinfo: (DEPOSIT as u64) + (nounce << 8),
+            account_index,
+            object_index,
+            amount,
+            sender,
         }
-        let c = if result as i32 == POSITION {true} else {false};
-        //wasm_dbg(POSITION as u64);
-        require(c as i32);
-        //require((result as i32 == POSITION) as i32);
+    }
+    pub fn to_bytes(&self) -> &[u8; 80] {
+        unsafe { std::mem::transmute(self) }
     }
 }
+
+impl WithdrawInfo {
+    pub fn new(nounce: u64, account_index: u32, object_index: u32, amount: [u64;4], sender: [u64; 4]) -> Self {
+        WithdrawInfo {
+            opinfo: (DEPOSIT as u64) + (nounce << 8),
+            account_index,
+            object_index,
+            amount,
+            sender,
+        }
+    }
+    pub fn to_bytes(&self) -> &[u8; 80] {
+        unsafe { std::mem::transmute(self) }
+    }
+}
+
+
+mod zkmain;

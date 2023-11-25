@@ -1,5 +1,5 @@
 import makeWasm from "./gameplay.wasm";
-import { __wbg_set_wasm } from "./gameplay.wasm_bg";
+//import { __wbg_set_wasm } from "./gameplay.wasm_bg";
 const { Module, instantiate, Memory, Table } = WebAssembly;
 
 var instance = null;
@@ -27,6 +27,22 @@ export default async function () {
           console.error("wasm_input should not been called in non-zkwasm mode");
           throw new Error("Unsupported wasm api: wasm_input");
         },
+        wasm_output: () => {
+          console.error("wasm_input should not been called in non-zkwasm mode");
+          throw new Error("Unsupported wasm api: wasm_input");
+        },
+        poseidon_new: () => {
+          console.error("wasm_input should not been called in non-zkwasm mode");
+          throw new Error("Unsupported wasm api: wasm_input");
+        },
+        poseidon_push: () => {
+          console.error("wasm_input should not been called in non-zkwasm mode");
+          throw new Error("Unsupported wasm api: wasm_input");
+        },
+        poseidon_finalize: () => {
+          console.error("wasm_input should not been called in non-zkwasm mode");
+          throw new Error("Unsupported wasm api: wasm_input");
+        },
       },
     });
     console.log("module loaded", module); // "3
@@ -36,7 +52,7 @@ export default async function () {
     );
     */
     instance = module.instance;
-    __wbg_set_wasm(instance.exports);
+    //__wbg_set_wasm(instance.exports);
     return instance.exports;
   }
 }

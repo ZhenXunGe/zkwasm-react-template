@@ -15,3 +15,20 @@ export function bytesToBN(data:Uint8Array) {
   }
   return bns;
 }
+
+export function bytesToU64Hex(data:Uint8Array) {
+  let bns = [];
+  for (let i = 0; i < data.length; i += 4) {
+    const chunk = data.slice(i, i + 4);
+    let a = new BN(chunk,'le');
+    bns.push("0x" + a.toString(16));
+    // do whatever
+  }
+  return bns;
+}
+
+export function BNtoBuffer(bn: BN) {
+    let bytes = bn.toArray("le",16);
+    let buf = new Uint8Array(bytes.length);
+    return buf;
+}
