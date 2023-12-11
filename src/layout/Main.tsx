@@ -29,7 +29,7 @@ import {
 import BN from "bn.js";
 import { bytesToU64Hex } from "../utils/proof";
 import lotimage from "../images/lot.jpg";
-import { CurveField, PrivateKey, PublicKey } from "delphinus-curves/dist/mjs/src/altjubjub";
+import { CurveField, PrivateKey, PublicKey } from "delphinus-curves/src/altjubjub";
 
 const initializeRustLib= async () => {
   await initGameInstance();
