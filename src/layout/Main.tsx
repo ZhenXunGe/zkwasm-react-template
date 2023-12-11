@@ -19,6 +19,7 @@ import "./style.scss";
 import "bootswatch/dist/slate/bootstrap.min.css";
 import { Container } from "react-bootstrap";
 import { MainNavBar } from "../components/Nav";
+import InputGroup from 'react-bootstrap/InputGroup';
 import { State, ActionType } from "../types/game";
 import { ModalOptions } from "../types/layout";
 import {
@@ -27,11 +28,10 @@ import {
 } from "../data/accountSlice";
 import BN from "bn.js";
 import { bytesToU64Hex } from "../utils/proof";
-
-import initrustlib, * as rustlib from "rustlib/web/pkg/delphinus_crypto.js";
+import lotimage from "../images/lot.jpg";
+import { CurveField, PrivateKey, PublicKey } from "delphinus-curves/dist/mjs/src/altjubjub";
 
 const initializeRustLib= async () => {
-  await initrustlib();
   await initGameInstance();
 };
 
@@ -81,7 +81,7 @@ export function Main() {
     buf.fill(lottoId, bytes.length);
     buf.fill(lottoNumber, bytes.length+1);
     console.log(buf);
-    let valuebuf = rustlib.sign(buf, buf);
+    let valuebuf = buf;
     let bns = bytesToU64Hex(valuebuf);
     setSignature(bns);
     let bns_str = bns.toString();
@@ -96,10 +96,12 @@ export function Main() {
     if (l2account) {
         let c = new BN(commitment.substring(2), 'hex');
         let bytes = c.toArray("le",16);
+        let prikey = PrivateKey.fromString(l2account);
         console.log("update...");
         const buf = new Uint8Array(bytes.length);
-        let pubkey = rustlib.get_public_key(buf);
-        let pubkeyinputs = bytesToU64Hex(pubkey);
+        let pubkey = prikey.publicKey;
+        let pubkeyinputs = ["0x123"]
+                    //bytesToU64Hex(pubkey);
         updateRandomness();
         let sig_witness:Array<string> = signature.map((v) => v+":i64");
         let pubkey_witness:Array<string> = pubkeyinputs.map((v) => v+":i64");
@@ -131,14 +133,45 @@ export function Main() {
       { 1 && (
         <>
           <Container style={{ position: "relative", top: "-10px", paddingBottom:"100px"}}>
-            <div>
-            <Button onClick={()=>incLottoRound()}> selected lotto id:  {lottoId}</Button>
-            <div style={{display:"inline-block", width:"100px", textAlign:"center", backgroundColor:"black"}}>
-            {lottoNumber}
-            </div>
+            <Row>
+                    <Col>
+                    <img style={{width:"400px", display:"inline-block"}} src={lotimage}></img>
+                    </Col>
+
+            <Col>
+                    <Form>
+                            <InputGroup className="mb-3">
+                                    <InputGroup.Text id="basic-addon1">Current Lotto Id</InputGroup.Text>
+                                    <Form.Control
+                                            placeholder="Username"
+                                            aria-label="Username"
+                                            aria-describedby="basic-addon1"
+                                            value = {lottoId}
+                                    />
+                            </InputGroup>
+                            <InputGroup className="mb-3">
+                                    <InputGroup.Text id="basic-addon1">Your Lotto Number</InputGroup.Text>
+                                    <Form.Control
+                                            placeholder="Username"
+                                            aria-label="Username"
+                                            aria-describedby="basic-addon1"
+                                            value = {lottoNumber}
+                                    />
+                            </InputGroup>
+
             <Button onClick={()=>pickLottoNumber(0)} active={lottoNumber == 0}> 0 </Button>
             <Button onClick={()=>pickLottoNumber(1)} active={lottoNumber == 1}> 1 </Button>
-            </div>
+            <Button onClick={()=>pickLottoNumber(2)} active={lottoNumber == 2}> 2 </Button>
+            <Button onClick={()=>pickLottoNumber(3)} active={lottoNumber == 3}> 3 </Button>
+            <Button onClick={()=>pickLottoNumber(4)} active={lottoNumber == 4}> 4 </Button>
+            <Button onClick={()=>pickLottoNumber(5)} active={lottoNumber == 5}> 5 </Button>
+            <Button onClick={()=>pickLottoNumber(6)} active={lottoNumber == 6}> 6 </Button>
+            <Button onClick={()=>pickLottoNumber(7)} active={lottoNumber == 7}> 7 </Button>
+            <Button onClick={()=>pickLottoNumber(8)} active={lottoNumber == 8}> 8 </Button>
+            <Button onClick={()=>pickLottoNumber(9)} active={lottoNumber == 9}> 9 </Button>
+                    </Form>
+            </Col>
+            </Row>
             <Form>
                   <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                     <Form.Label>Current Randomness Commitment</Form.Label>

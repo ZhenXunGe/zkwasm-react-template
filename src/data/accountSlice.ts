@@ -1,22 +1,26 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { DelphinusWeb3, withBrowerWeb3 } from "web3subscriber/src/client";
+import { withBrowserConnector } from "web3subscriber/src/client";
+import { DelphinusBrowserConnector} from 'web3subscriber/src/provider';
 import { signMessage } from "../utils/address";
 
 export interface L1AccountInfo {
   address: string;
   chainId: string;
-  web3: any;
 }
 
 async function loginL1Account() {
-  return await withBrowerWeb3(async (web3: DelphinusWeb3) => {
-    let i = await web3.getAccountInfo();
-    return i;
+  return await withBrowserConnector(async (web3: DelphinusBrowserConnector) => {
+    let i = await web3.getJsonRpcSigner();
+    return {
+        address: await i.getAddress(),
+        chainId: (await web3.getNetworkId()).toString()
+    }
   });
 }
 
 async function loginL2Account(address: string ) {
   let str:string = await signMessage(address);
+  console.log("signed result", str);
   return str.substring(0,34);
 }
 
