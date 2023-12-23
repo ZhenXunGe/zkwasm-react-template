@@ -23,6 +23,14 @@ export default async function () {
             throw new Error("Require failed");
           }
         },
+        wasm_dbg: (c) => {
+          console.log("wasm_dbg", c);
+        },
+        wasm_dbg_char: () => {
+          console.error("wasm_dbg_char should not been called in non-zkwasm mode");
+          throw new Error("Unsupported wasm api: wasm_input");
+        },
+
         wasm_input: () => {
           console.error("wasm_input should not been called in non-zkwasm mode");
           throw new Error("Unsupported wasm api: wasm_input");
@@ -41,6 +49,18 @@ export default async function () {
         },
         poseidon_finalize: () => {
           console.error("wasm_input should not been called in non-zkwasm mode");
+          throw new Error("Unsupported wasm api: wasm_input");
+        },
+        babyjubjub_sum_new: () => {
+          console.error("baby_jubjub_sum_new");
+          throw new Error("Unsupported wasm api: wasm_input");
+        },
+        babyjubjub_sum_push: () => {
+          console.error("baby_jubjub_sum_new");
+          throw new Error("Unsupported wasm api: wasm_input");
+        },
+        babyjubjub_sum_finalize: () => {
+          console.error("baby_jubjub_sum_new");
           throw new Error("Unsupported wasm api: wasm_input");
         },
       },
