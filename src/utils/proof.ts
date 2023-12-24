@@ -32,3 +32,12 @@ export function BNtoBuffer(bn: BN) {
     let buf = new Uint8Array(bytes.length);
     return buf;
 }
+
+export function numToUint8Array(num: number): Uint8Array {
+    let arr = new Uint8Array(8);
+    for (let i = 0; i < 8; i++) {
+       arr[i] = num % 256;
+       num = Math.floor(num / 256);
+    }
+    return arr;
+}

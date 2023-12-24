@@ -16,6 +16,8 @@ import { MainNavBar } from "../components/Nav";
 import InputGroup from 'react-bootstrap/InputGroup';
 import { State, ActionType } from "../types/game";
 import { ModalOptions } from "../types/layout";
+import { numToUint8Array } from "../utils/proof";
+
 import {
   //selectL1Account,
   selectL2Account,
@@ -114,9 +116,10 @@ export function Main() {
 
 
   const msgToSign = () => {
-    const buf = new Uint8Array(2);
-    buf.fill(1, 0);
-    buf.fill(0, 1);
+    const buf = new Uint8Array(commands.length * 8);
+    commands.map((v, i) => {
+      buf.set(numToUint8Array(v), 8*i);
+    });
     console.log(buf);
     return buf;
   }
@@ -223,7 +226,9 @@ export function Main() {
 
                   <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                     <Form.Label>Movements</Form.Label>
-                    <Form.Control as="input" value ={commands.join(";")}/>
+                    <Form.Control as="input" value = {
+                          commands.map((x) => ` ${x}:i64`).join(";")
+                     }/>
                   </Form.Group>
                   <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                     <Form.Label>PublicKey-X</Form.Label>

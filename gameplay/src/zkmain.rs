@@ -141,10 +141,16 @@ pub fn step(command: u64) {
 pub fn zkmain() -> i64 {
     let mut hasher = Sha256::new();
 
-    unsafe {
-        wasm_dbg(123);
+    let commands_len = unsafe {wasm_input(0)};
+    for _ in 0..commands_len {
+        let command = unsafe {wasm_input(0)};
+        hasher.update(command.to_le_bytes());
+        step(command);
     }
-    zkwasm_rust_sdk::dbg!("test\n");
+
+    let msghash = hasher.finalize();
+
+    zkwasm_rust_sdk::dbg!("command hash is {:?}\n", msghash);
 
     /*
     let msghash = unsafe {[
@@ -155,12 +161,14 @@ pub fn zkmain() -> i64 {
     ]};
     */
 
+    /*
     let msghash = unsafe {[
         wasm_input(1),
         wasm_input(1),
         wasm_input(1),
         wasm_input(1),
     ]};
+    */
 
 
     zkwasm_rust_sdk::dbg!("msg {:?}\n", msghash);
@@ -189,12 +197,7 @@ pub fn zkmain() -> i64 {
         ]),
     }};
     zkwasm_rust_sdk::dbg!("process sig\n");
-    /*
-    hasher.update(pk.x.0[0].to_be_bytes());
-    hasher.update(pk.x.0[1].to_be_bytes());
-    hasher.update(pk.x.0[2].to_be_bytes());
-    hasher.update(pk.x.0[3].to_be_bytes());
-    */
+
     let sig = unsafe {JubjubSignature {
         sig_r: BabyJubjubPoint {
             x: U256([
@@ -217,8 +220,16 @@ pub fn zkmain() -> i64 {
             wasm_input(0),
         ]
     }};
-    zkwasm_rust_sdk::dbg!("start verifying ...");
-    sig.verify(&pk, &msghash);
+    zkwasm_rust_sdk::dbg!("start verifying ...\n");
+
+    let msghash_u64 = [
+        u64::from_be_bytes(msghash[24..32].try_into().unwrap()),
+        u64::from_be_bytes(msghash[16..24].try_into().unwrap()),
+        u64::from_be_bytes(msghash[8..16].try_into().unwrap()),
+        u64::from_be_bytes(msghash[0..8].try_into().unwrap()),
+    ];
+
+    sig.verify(&pk, &msghash_u64);
 
     /*
     let result = hasher.finalize();
