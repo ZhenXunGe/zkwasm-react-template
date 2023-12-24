@@ -53,7 +53,5 @@ module.exports = function override(config, env) {
     //use: [{ loader: 'file-loader'}]
   })
 
-
-
   return config
 }
