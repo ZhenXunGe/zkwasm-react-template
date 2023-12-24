@@ -18,4 +18,4 @@ RUN npm install
 RUN npm run build
 
 # Your application is now built, you can add commands to run it
-# CMD [ "node", "your-app-start-file.js" ]
+ENTRYPOINT [ "npm ", "run start" ]
