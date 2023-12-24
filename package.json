@@ -31,10 +31,10 @@
     "zkwasm-service-helper": "git+https://github.com/DelphinusLab/zkWasm-service-helper.git"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject",
+    "start": "npx react-app-rewired start",
+    "build": "npx react-app-rewired build",
+    "test": "npx react-app-rewired test",
+    "eject": "npx react-app-rewired eject",
     "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --validate --sourceMap --debug",
     "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --validate --sourceMap --optimize",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
