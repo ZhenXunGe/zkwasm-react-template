@@ -1,4 +1,5 @@
 import BN from "bn.js";
+import { PrivateKey, PublicKey, bnToHexLe } from "delphinus-curves/src/altjubjub";
 
 export function Inputs(inputs: Array<string>) {
   return inputs.join(";");
@@ -40,4 +41,15 @@ export function numToUint8Array(num: number): Uint8Array {
        num = Math.floor(num / 256);
     }
     return arr;
+}
+
+export class SignatureWitness {
+  pkey: Array<string>;
+  sig: Array<string>;
+  constructor(prikey: PrivateKey, msg: Uint8Array) {
+    let sig = prikey.sign(msg);
+    let pkey = prikey.publicKey;
+    this.pkey = [bnToHexLe(pkey.key.x.v), bnToHexLe(pkey.key.y.v)];
+    this.sig = [bnToHexLe(sig[0][0]), bnToHexLe(sig[0][1]), bnToHexLe(sig[1])];
+  }
 }

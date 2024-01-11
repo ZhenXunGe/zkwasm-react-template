@@ -11,18 +11,6 @@ export async function signMessage(message: string) {
     if (!provider) {
       throw new Error("No provider found!");
     }
-
-    /* FIXME: append account at the tail of message
-    const accounts = await web3.web3Instance.eth.getAccounts();
-    const account = accounts[0];
-    const msg = web3.web3Instance.utils.utf8ToHex(message);
-    const msgParams = [msg, account];
-    //TODO: type this properly
-    const sig = await (provider as any).request({
-      method: "personal_sign",
-      params: msgParams,
-    });
-    */
     const signature = provider.sign(message);
     return signature;
   });

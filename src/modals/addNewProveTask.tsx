@@ -153,7 +153,6 @@ export function NewProveTask(props: NewWASMImageProps) {
             type="text"
             value={props.witness}
             multiple={false}
-            disabled={true}
           />
         </Form.Group>
       </Container>

@@ -16,7 +16,7 @@ import { MainNavBar } from "../components/Nav";
 import InputGroup from 'react-bootstrap/InputGroup';
 import { State, ActionType } from "../types/game";
 import { ModalOptions } from "../types/layout";
-import { numToUint8Array } from "../utils/proof";
+import { numToUint8Array, SignatureWitness } from "../utils/proof";
 
 import {
   //selectL1Account,
@@ -133,12 +133,11 @@ export function Main() {
         let msg = msgToSign();
         console.log(l2account);
         let prikey = PrivateKey.fromString(l2account.substring(2));
-        let sig = prikey.sign(msg);
-        let pkey = prikey.publicKey;
-        setPubkey([bnToHexLe(pkey.key.x.v), bnToHexLe(pkey.key.y.v)]);
-        setSignature([bnToHexLe(sig[0][0]), bnToHexLe(sig[0][1]), bnToHexLe(sig[1])]);
-        let sig_witness:Array<string> = signature.map((v) => "0x" + v+ ":bytes-packed");
-        let pubkey_witness:Array<string> = pubkey.map((v) => "0x" + v+ ":bytes-packed");
+        let signingWitness = new SignatureWitness(prikey, msg);
+        setPubkey(signingWitness.pkey);
+        setSignature(signingWitness.sig);
+        let sig_witness:Array<string> = signingWitness.sig.map((v) => "0x" + v+ ":bytes-packed");
+        let pubkey_witness:Array<string> = signingWitness.pkey.map((v) => "0x" + v+ ":bytes-packed");
         let witness = pubkey_witness;
         for (var s of sig_witness) {
             witness.push(s);

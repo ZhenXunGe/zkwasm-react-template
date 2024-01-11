@@ -100,7 +100,6 @@ fn set_target(target: u64) {
         GLOBAL.food -= 30;
         GLOBAL.energy -= 30;
     }
-
 }
 
 #[wasm_bindgen]
@@ -154,15 +153,6 @@ pub fn zkmain() -> i64 {
 
     /*
     let msghash = unsafe {[
-        u64::from_le_bytes(wasm_input(1).to_be_bytes()),
-        u64::from_le_bytes(wasm_input(1).to_be_bytes()),
-        u64::from_le_bytes(wasm_input(1).to_be_bytes()),
-        u64::from_le_bytes(wasm_input(1).to_be_bytes()),
-    ]};
-    */
-
-    /*
-    let msghash = unsafe {[
         wasm_input(1),
         wasm_input(1),
         wasm_input(1),
@@ -172,15 +162,6 @@ pub fn zkmain() -> i64 {
 
 
     zkwasm_rust_sdk::dbg!("msg {:?}\n", msghash);
-
-    /*
-    hasher.update(msghash[0].to_be_bytes());
-    hasher.update(msghash[1].to_be_bytes());
-    hasher.update(msghash[2].to_be_bytes());
-    hasher.update(msghash[3].to_be_bytes());
-    */
-
-    zkwasm_rust_sdk::dbg!("test\n");
 
     let pk = unsafe {BabyJubjubPoint {
         x: U256([
