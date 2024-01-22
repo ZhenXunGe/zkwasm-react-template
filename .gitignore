@@ -8,3 +8,9 @@
 node_modules
 
 /gameplay/target
+
+/build
+
+/dist
+
+/.parcel-cache

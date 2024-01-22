@@ -1,92 +1,91 @@
 {
-  "name": "zkwasmpg",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@esotericsoftware/spine-canvas": "^4.2.15",
-    "@esotericsoftware/spine-player": "^4.2.15",
-    "@esotericsoftware/spine-ts": "^4.2.13",
-    "@reduxjs/toolkit": "^1.5.1",
-
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
-    "https-browserify": "^1.0.0",
-    "os-browserify": "^0.3.0",
-    "assert": "^2.1.0",
-    "stream-http": "^3.2.0",
-    "stream-browserify": "^3.0.0",
-    "react-app-rewired": "^2.2.1",
-    "file-loader": "^6.2.0",
-    "process": "^0.11.10",
-    "url": "^0.11.3",
-    "wasm-loader": "^1.3.0",
-
-    "axios": "^1.2.1",
-    "bootstrap": "^5.1.3",
-    "bootstrap-icons": "^1.10.3",
-    "bootswatch": "^5.2.3",
-    "concurrently": "^7.0.0",
-    "cors": "^2.8.5",
-    "crypto-js": "^4.1.1",
-    "delphinus-curves": "git+https://github.com/DelphinusLab/delphinus-curves.git#yyu/hybridPackage",
-    "express": "^4.17.1",
-    "form-data": "^4.0.0",
-    "node-sass": "^7.0.1",
-    "qrcode": "^1.5.1",
-    "qrcode.react": "^3.1.0",
-    "react": "^18.2.0",
-    "react-bootstrap": "^2.7.0",
-    "react-dom": "^18.2.0",
-    "react-redux": "^8.0.5",
-    "react-scripts": "^5.0.1",
-    "servicehelper": "git+https://github.com/DelphinusLab/service-helper.git",
-    "wait-on": "^6.0.1",
-    "web3subscriber": "git+https://github.com/DelphinusLab/delphinus-web3subscriber.git",
-    "zkwasm-service-helper": "git+https://github.com/DelphinusLab/zkWasm-service-helper.git"
-  },
-  "scripts": {
-    "start": "npx react-app-rewired start",
-    "build": "npx react-app-rewired build",
-    "test": "npx react-app-rewired test",
-    "eject": "npx react-app-rewired eject",
-    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --validate --sourceMap --debug",
-    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --validate --sourceMap --optimize",
-    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "homepage": "./",
-  "build": {
-    "appId": "com.github.zhenxunge.zkwasmpg",
-    "files": [
-      "build/**/*",
-      "node_modules/**/*"
-    ],
-    "directories": {
-      "buildResources": "assets"
+    "name": "zkwasmpg",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@esotericsoftware/spine-canvas": "^4.2.15",
+        "@esotericsoftware/spine-player": "^4.2.15",
+        "@esotericsoftware/spine-ts": "^4.2.13",
+        "@reduxjs/toolkit": "^1.5.1",
+        "buffer": "^6.0.3",
+        "crypto-browserify": "^3.12.0",
+        "https-browserify": "^1.0.0",
+        "os-browserify": "^0.3.0",
+        "assert": "^2.1.0",
+        "stream-http": "^3.2.0",
+        "stream-browserify": "^3.0.0",
+        "react-app-rewired": "^2.2.1",
+        "file-loader": "^6.2.0",
+        "process": "^0.11.10",
+        "url": "^0.11.3",
+        "wasm-loader": "^1.3.0",
+        "axios": "^1.2.1",
+        "bootstrap": "^5.1.3",
+        "bootstrap-icons": "^1.10.3",
+        "bootswatch": "^5.2.3",
+        "concurrently": "^7.0.0",
+        "cors": "^2.8.5",
+        "crypto-js": "^4.1.1",
+        "delphinus-curves": "git+https://github.com/DelphinusLab/delphinus-curves.git#yyu/hybridPackage",
+        "express": "^4.17.1",
+        "form-data": "^4.0.0",
+        "node-sass": "^7.0.1",
+        "qrcode": "^1.5.1",
+        "qrcode.react": "^3.1.0",
+        "react": "^18.2.0",
+        "react-bootstrap": "^2.7.0",
+        "react-dom": "^18.2.0",
+        "react-redux": "^8.0.5",
+        "react-scripts": "^5.0.1",
+        "servicehelper": "git+https://github.com/DelphinusLab/service-helper.git",
+        "wait-on": "^6.0.1",
+        "web3subscriber": "git+https://github.com/DelphinusLab/delphinus-web3subscriber.git",
+        "zkwasm-service-helper": "git+https://github.com/DelphinusLab/zkWasm-service-helper.git",
+        "zkc-sdk": "^0.1.6-alpha"
+    },
+    "scripts": {
+        "start": "npx react-app-rewired start",
+        "build": "npx react-app-rewired build",
+        "test": "npx react-app-rewired test",
+        "eject": "npx react-app-rewired eject",
+        "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --validate --sourceMap --debug",
+        "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --validate --sourceMap --optimize",
+        "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "homepage": "./",
+    "build": {
+        "appId": "com.github.zhenxunge.zkwasmpg",
+        "files": [
+            "build/**/*",
+            "node_modules/**/*"
+        ],
+        "directories": {
+            "buildResources": "assets"
+        }
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.12",
+        "@types/express": "^4.17.13",
+        "@types/jest": "^29.2.4",
+        "@types/lru-cache": "^7.10.10",
+        "@types/qrcode": "^1.5.0",
+        "@types/react-dom": "^18.0.10",
+        "@types/sha256": "^0.2.2",
+        "typescript": "^4.3.4"
     }
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "@types/cors": "^2.8.12",
-    "@types/express": "^4.17.13",
-    "@types/jest": "^29.2.4",
-    "@types/lru-cache": "^7.10.10",
-    "@types/qrcode": "^1.5.0",
-    "@types/react-dom": "^18.0.10",
-    "@types/sha256": "^0.2.2",
-    "typescript": "^4.3.4"
-  }
 }
