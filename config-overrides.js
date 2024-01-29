@@ -45,13 +45,6 @@ module.exports = function override(config, env) {
     })
   })
 
-  config.module.rules.push({
-    test: wasmExtensionRegExp,
-    include: path.resolve(__dirname, 'src'),
-    type: "javascript/auto",
-    use: [{ loader: 'wasm-loader'}]
-    //use: [{ loader: 'file-loader'}]
-  })
 
   return config
 }
