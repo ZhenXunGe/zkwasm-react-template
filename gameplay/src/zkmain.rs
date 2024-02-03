@@ -4,6 +4,7 @@ use zkwasm_rust_sdk::wasm_output;
 use zkwasm_rust_sdk::wasm_input;
 use zkwasm_rust_sdk::wasm_dbg;
 use zkwasm_rust_sdk::require;
+use zkwasm_rust_sdk::merkle::Merkle;
 use primitive_types::U256;
 
 use wasm_bindgen::prelude::*;
@@ -17,6 +18,13 @@ struct State {
     civil: u64,
     energy: u64,
     food: u64,
+    reward: u64,
+}
+
+
+#[derive (Default)]
+struct Planet {
+    connect: [u64; 3],
     reward: u64,
 }
 
@@ -83,6 +91,25 @@ const CMD_TRANSPORT: u64 = 0;
 const CMD_RECHARGE: u64 = 1;
 const CMD_DIG: u64 = 2;
 
+fn setup_map(target: u64) {
+    let mut hasher = Sha256::new();
+    hasher.update(target.to_be_bytes());
+    let hash = hasher.finalize();
+    unsafe {
+        GLOBAL.location = target;
+        GLOBAL.targets = [
+            u32::from_be_bytes(hash[0..4].try_into().unwrap()) as u64,
+            u32::from_be_bytes(hash[4..8].try_into().unwrap()) as u64,
+            u32::from_be_bytes(hash[8..12].try_into().unwrap()) as u64,
+            u32::from_be_bytes(hash[12..16].try_into().unwrap()) as u64,
+        ];
+        GLOBAL.regenerate = u32::from_be_bytes(hash[16..20].try_into().unwrap()) as u64;
+        GLOBAL.civil = u32::from_be_bytes(hash[16..20].try_into().unwrap()) as u64;
+        GLOBAL.food -= 30;
+        GLOBAL.energy -= 30;
+    }
+}
+
 fn set_target(target: u64) {
     let mut hasher = Sha256::new();
     hasher.update(target.to_be_bytes());
@@ -105,6 +132,19 @@ fn set_target(target: u64) {
 #[wasm_bindgen]
 pub fn init(target: u64) {
     set_target(target & 0xffffffff);
+    let mut hasher = Sha256::new();
+    let rand = target;
+    hasher.update(rand.to_be_bytes());
+    let ids = hasher.finalize(); //32 nodes
+    let mut planets:Vec<Planet> = Vec::with_capacity(32);
+    for i in 0..32 {
+        planets[i].connect = [ids[(i+1)%32] as u64, ids[(i+2)%32] as u64, ids[(i+3)%32] as u64];
+    }
+
+    let mut merkle = Merkle::new();
+    for i in 0..32 {
+        merkle.set(ids[i] as u32, &planets[i].connect, true, None);
+    }
 }
 
 #[wasm_bindgen]

@@ -260,7 +260,7 @@ dependencies = [
 [[package]]
 name = "zkwasm-rust-sdk"
 version = "0.1.0"
-source = "git+https://github.com/DelphinusLab/zkWasm-rust.git?branch=witness-gen#74ad57358ce810b08f96113758501c4b427e115c"
+source = "git+https://github.com/DelphinusLab/zkWasm-rust.git?branch=main#2356d47b0ee970877a7bca6443636ed671295913"
 dependencies = [
  "primitive-types",
  "wasm-bindgen",
