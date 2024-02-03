@@ -137,9 +137,16 @@ pub fn init(target: u64) {
     hasher.update(rand.to_be_bytes());
     let ids = hasher.finalize(); //32 nodes
     let mut planets:Vec<Planet> = Vec::with_capacity(32);
+    unsafe {wasm_dbg(ids.len() as u64);};
     for i in 0..32 {
-        planets[i].connect = [ids[(i+1)%32] as u64, ids[(i+2)%32] as u64, ids[(i+3)%32] as u64];
+        let planet = Planet {
+            connect: [ids[(i+1)%32] as u64, ids[(i+2)%32] as u64, ids[(i+3)%32] as u64],
+            reward: 0,
+        };
+        planets.push(planet);
+
     }
+    unsafe {wasm_dbg(123);};
 
     let mut merkle = Merkle::new();
     for i in 0..32 {
