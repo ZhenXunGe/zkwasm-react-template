@@ -19,8 +19,8 @@ export function bytesToBN(data:Uint8Array) {
 
 export function bytesToU64Hex(data:Uint8Array) {
   let bns = [];
-  for (let i = 0; i < data.length; i += 4) {
-    const chunk = data.slice(i, i + 4);
+  for (let i = 0; i < data.length; i += 8) {
+    const chunk = data.slice(i, i + 8);
     let a = new BN(chunk,'le');
     bns.push("0x" + a.toString(16));
     // do whatever

@@ -30,18 +30,33 @@ export function Main() {
   const dispatch = useAppDispatch();
   const [wasmInstance, setWasmInstance] = useState<WasmInstance | null>(null);
   const [currentModal, setCurrentModal] = useState<ModalOptions | null>(null);
+
+  // Game related handlers for state
   const [energy, setEnergy] = useState<number>(0);
   const [food, setFood] = useState<number>(0);
   const [targets, setTargets] = useState<Array<number>>([]);
-  const [witness, setWitness] = useState<Array<string>>([]);
   const [commands, setCommands] = useState<Array<number>>([]);
   const [instances, setInstances] = useState<Array<string>>([]);
   const [location, setLocation] = useState<string>("loading...");
   const [reward, setReward] = useState<number>(0);
+
+  // Signature Related
+
   const [signature, setSignature] = useState<Array<string>>([]);
   const [pubkey, setPubkey] = useState<Array<string>>([]);
+  const [witness, setWitness] = useState<Array<string>>([]);
+
+  // Game Loading Status
+  const [merkleRoot, setMerkleRoot] = useState<Array<number>>([0,0,0,0]);
   const [loaded, setLoaded] = useState<boolean>(false);
+
   let l2account = useAppSelector(selectL2Account);
+
+  function updateMerkle(index: number, value: number) {
+    let a = merkleRoot;
+    a[index] = value;
+    setMerkleRoot(a);
+  }
 
   function updateState(ins: WasmInstance) {
       let location = ins.get_location();
@@ -57,12 +72,22 @@ export function Main() {
       setTargets([Number(target0), Number(target1), Number(target2)]);
   }
 
+        /* Test merkle root
+        6411109203874391172
+        12156582326191033569
+        18190570047656100927
+        2451350522329201736
+         */
 
-  function initGame(l2account: bigint) {
+  function loadGame(l2account: bigint) {
     initGameInstance().then((ins: WasmInstance) => {
-      console.log("setting instance");
-      setWasmInstance(ins);
-      ins.init(l2account);
+      ins.load(
+          l2account,
+          BigInt(merkleRoot[0]),
+          BigInt(merkleRoot[1]),
+          BigInt(merkleRoot[2]),
+          BigInt(merkleRoot[3])
+      );
       let location = ins.get_location();
       let energy = ins.get_energy();
       let food = ins.get_food();
@@ -76,6 +101,15 @@ export function Main() {
       let target1 = ins.get_target(1);
       let target2 = ins.get_target(2);
       setTargets([Number(target0), Number(target1), Number(target2)]);
+      setLoaded(true);
+    });
+  }
+
+  function initGame(l2account: bigint) {
+    initGameInstance().then((ins: WasmInstance) => {
+      console.log("setting instance");
+      setWasmInstance(ins);
+      ins.init(l2account);
     });
   };
 
@@ -127,22 +161,22 @@ export function Main() {
   useEffect(() => {
     if (l2account) {
         if (loaded == false) {
-            initGame(BigInt(l2account));
-            setLoaded(true);
+            initGame(BigInt("0x" + l2account.address));
+        } else {
+            let msg = msgToSign();
+            console.log(l2account);
+            let prikey = PrivateKey.fromString(l2account.address);
+            let signingWitness = new SignatureWitness(prikey, msg);
+            setPubkey(signingWitness.pkey);
+            setSignature(signingWitness.sig);
+            let sig_witness:Array<string> = signingWitness.sig.map((v) => "0x" + v+ ":bytes-packed");
+            let pubkey_witness:Array<string> = signingWitness.pkey.map((v) => "0x" + v+ ":bytes-packed");
+            let witness = pubkey_witness;
+            for (var s of sig_witness) {
+                witness.push(s);
+            }
+            setWitness(witness);
         }
-        let msg = msgToSign();
-        console.log(l2account);
-        let prikey = PrivateKey.fromString(l2account.substring(2));
-        let signingWitness = new SignatureWitness(prikey, msg);
-        setPubkey(signingWitness.pkey);
-        setSignature(signingWitness.sig);
-        let sig_witness:Array<string> = signingWitness.sig.map((v) => "0x" + v+ ":bytes-packed");
-        let pubkey_witness:Array<string> = signingWitness.pkey.map((v) => "0x" + v+ ":bytes-packed");
-        let witness = pubkey_witness;
-        for (var s of sig_witness) {
-            witness.push(s);
-        }
-        setWitness(witness);
     }
   }, [l2account, location]);
 
@@ -158,6 +192,41 @@ export function Main() {
           </Col>
         </Row>
       </Container>
+
+      {1 &&
+          <Container style={{top: "10px"}}>
+            <Row>
+              <Col>
+                 <Form>
+                   <InputGroup className="mb-3">
+                     <InputGroup.Text>Merkle Root 0</InputGroup.Text>
+                     <Form.Control
+                         as = "input"
+                         onChange = {(event) => {updateMerkle(0, Number(event.target.value))}}
+                      />
+                     <Form.Control
+                         as = "input"
+                         onChange = {(event) => {updateMerkle(1, Number(event.target.value))}}
+                      />
+                     <Form.Control
+                         as = "input"
+                         onChange = {(event) => {updateMerkle(2, Number(event.target.value))}}
+                      />
+                     <Form.Control
+                         as = "input"
+                         onChange = {(event) => {updateMerkle(3, Number(event.target.value))}}
+                      />
+                     <InputGroup.Text
+                         onClick = {() => {loadGame(l2account!.toBigInt())}}
+                      >
+                      Load Game</InputGroup.Text>
+
+                   </InputGroup>
+                </Form>
+              </Col>
+            </Row>
+          </Container>
+      }
 
       { 1 && (
         <>
@@ -222,33 +291,32 @@ export function Main() {
               </Col>
             </Row>
             <Form>
-
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                    <Form.Label>Movements</Form.Label>
-                    <Form.Control as="input" value = {
+              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                <Form.Label>Movements</Form.Label>
+                <Form.Control as="input" value = {
                           commands.map((x) => ` ${x}:i64`).join(";")
-                     }/>
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                    <Form.Label>PublicKey-X</Form.Label>
-                    <Form.Control as="input" value ={witness[0]}/>
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                    <Form.Label>PublicKey-Y</Form.Label>
-                    <Form.Control as="input" value ={witness[1]}/>
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                    <Form.Label>Signature-X</Form.Label>
-                    <Form.Control as="input" value ={witness[2]}/>
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                    <Form.Label>Signature-Y</Form.Label>
-                    <Form.Control as="input" value ={witness[3]}/>
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                    <Form.Label>Signature-S</Form.Label>
-                    <Form.Control as="input" value ={witness[4]}/>
-                  </Form.Group>
+                }/>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                <Form.Label>PublicKey-X</Form.Label>
+                <Form.Control as="input" value ={witness[0]}/>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                <Form.Label>PublicKey-Y</Form.Label>
+                <Form.Control as="input" value ={witness[1]}/>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                <Form.Label>Signature-X</Form.Label>
+                <Form.Control as="input" value ={witness[2]}/>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                <Form.Label>Signature-Y</Form.Label>
+                <Form.Control as="input" value ={witness[3]}/>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                <Form.Label>Signature-S</Form.Label>
+                <Form.Control as="input" value ={witness[4]}/>
+              </Form.Group>
             </Form>
             <NewProveTask
               md5="EDDF817B748715A7F2708873D7346941"

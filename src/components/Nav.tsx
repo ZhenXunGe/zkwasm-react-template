@@ -68,7 +68,7 @@ export function MainNavBar(props: IProps) {
                 <div className="divider"></div>
                 <Navbar.Text>
                   <div>Processing Key</div>
-                  <div>{l2account}</div>
+                  <div>{l2account.address}</div>
                 </Navbar.Text>
               </>
             )}

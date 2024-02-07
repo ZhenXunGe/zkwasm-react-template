@@ -61,17 +61,29 @@ export function get_food() {
 }
 
 /**
-* @param {bigint} target
-*/
-export function init(target) {
-    wasm.init(target);
-}
-
-/**
+* Step function receives a encoded command and changes the global state accordingly
 * @param {bigint} command
 */
 export function step(command) {
     wasm.step(command);
+}
+
+/**
+* @param {bigint} account
+* @param {bigint} r0
+* @param {bigint} r1
+* @param {bigint} r2
+* @param {bigint} r3
+*/
+export function load(account, r0, r1, r2, r3) {
+    wasm.load(account, r0, r1, r2, r3);
+}
+
+/**
+* @param {bigint} target
+*/
+export function init(target) {
+    wasm.init(target);
 }
 
 /**
