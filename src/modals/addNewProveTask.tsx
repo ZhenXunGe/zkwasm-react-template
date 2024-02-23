@@ -1,25 +1,23 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { useState } from "react";
-import { Container, Form, Spinner } from "react-bootstrap";
+import { useBTCProvider } from "@particle-network/btc-connectkit";
+import React from "react";
+import { Container, Form } from "react-bootstrap";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { selectL1Account } from "../data/accountSlice";
+import { addProvingTask, loadStatus } from "../data/statusSlice";
 import {
   ModalCommon,
   ModalCommonProps,
-  ModalStatus,
-  WaitingForResponseBar,
+  ModalStatus
 } from "./base";
-import { addProvingTask, loadStatus, selectTasks } from "../data/statusSlice";
-import { loginL1AccountAsync, selectL1Account } from "../data/accountSlice";
-import { withBrowserConnector} from "web3subscriber/src/client";
 
 import "./style.scss";
 
 import {
   ProvingParams,
-  ZkWasmUtil,
   WithSignature,
+  ZkWasmUtil,
 } from "zkwasm-service-helper";
-import {DelphinusBrowserConnector} from "web3subscriber/src/provider";
 
 interface NewWASMImageProps {
   md5: string;
@@ -27,28 +25,6 @@ interface NewWASMImageProps {
   witness: string[]; // Data
   OnTaskSubmitSuccess?: (receipt: any) => void;
   OnTaskSubmitFail?: (error: any) => void;
-}
-
-export async function signMessage(message: string) {
-  let signature = await withBrowserConnector(async (provider: DelphinusBrowserConnector) => {
-    if (!provider) {
-      throw new Error("No provider found!");
-    }
-    /* FIXME: append account pubkey at the end of the message
-    const accounts = await web3.web3Instance.eth.getAccounts();
-    const account = accounts[0];
-    const msg = web3.web3Instance.utils.utf8ToHex(message);
-    const msgParams = [msg, account];
-    //TODO: type this properly
-    const sig = await (provider as any).request({
-      method: "personal_sign",
-      params: msgParams,
-    });
-    */
-    const signature = provider.sign(message);
-    return signature;
-  });
-  return signature;
 }
 
 export function NewProveTask(props: NewWASMImageProps) {
@@ -67,6 +43,8 @@ export function NewProveTask(props: NewWASMImageProps) {
       public_inputs: props.inputs,
       private_inputs: props.witness,
     };
+
+    const { signMessage } = useBTCProvider();
 
     let msgString = ZkWasmUtil.createProvingSignMessage(info);
 

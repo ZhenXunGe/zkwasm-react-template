@@ -1,22 +1,26 @@
-import React, { createRef, useState, useEffect, useRef } from "react";
-import "./style.scss";
-import { useAppSelector, useAppDispatch } from "../app/hooks";
-import { loginL1AccountAsync, selectL1Account, loginL2AccountAsync, selectL2Account } from "../data/accountSlice";
-import { addressAbbreviation } from "../utils/address";
+import { isEVMProvider, isMetaMask } from "@particle-network/connect";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
-  Button,
-  Container,
-  Form,
-  Nav,
-  Navbar,
-  NavDropdown,
-  Row,
-  Col,
-} from "react-bootstrap";
+  loginL1AccountAsync,
+  loginL2AccountAsync,
+  selectL1Account,
+  selectL2Account,
+} from "../data/accountSlice";
+import { addressAbbreviation } from "../utils/address";
+import "./style.scss";
 
+import { Container, Nav, Navbar } from "react-bootstrap";
+
+import {
+  ConnectButton,
+  useAccount,
+  useParticleProvider,
+} from "@particle-network/connect-react-ui";
+import Web3 from "web3";
+import HomeIcon from "../images/home-icon.png";
 import logo from "../images/logo.png";
 import Restart from "../images/restart.png";
-import HomeIcon from "../images/home-icon.png";
 
 interface IProps {
   currency: number;
@@ -25,6 +29,9 @@ interface IProps {
 
 export function MainNavBar(props: IProps) {
   const dispatch = useAppDispatch();
+  const provider = useParticleProvider();
+
+  const address = useAccount();
 
   let account = useAppSelector(selectL1Account);
   let l2account = useAppSelector(selectL2Account);
@@ -32,6 +39,19 @@ export function MainNavBar(props: IProps) {
   useEffect(() => {
     dispatch(loginL1AccountAsync());
   }, []);
+
+  useEffect(() => {
+    if (provider && isEVMProvider(provider)) {
+      window.web3 = new Web3(provider as any);
+    }
+  }, [provider]);
+
+  const isMetaMaskInjected =
+    typeof window !== "undefined" &&
+    typeof window.ethereum !== "undefined" &&
+    (window.ethereum.providers?.some(isMetaMask) || window.ethereum.isMetaMask);
+
+  console.log(account, address, "==============");
 
   return (
     <Navbar expand="lg" style={{ zIndex: "1000" }}>
@@ -63,36 +83,36 @@ export function MainNavBar(props: IProps) {
                 </Navbar.Text>
               </>
             )}
-            {l2account && (
+
+            {!account && (
+              <>
+                <div className="divider"></div>
+                <div
+                  className="connect-btn"
+                  onClick={() => dispatch(loginL1AccountAsync())}
+                >
+                  <ConnectButton />
+                </div>
+              </>
+            )}
+            {!l2account && (
+              <>
+                <div className="divider"></div>
+                <Nav.Link
+                  onClick={() => dispatch(loginL2AccountAsync(address!))}
+                  className="px-2 my-2 py-0"
+                >
+                  Derive Processing Key
+                </Nav.Link>
+              </>
+            )}
+                  {l2account && (
               <>
                 <div className="divider"></div>
                 <Navbar.Text>
                   <div>Processing Key</div>
                   <div>{l2account}</div>
                 </Navbar.Text>
-              </>
-            )}
-
-            {!account && (
-              <>
-                <div className="divider"></div>
-                <Nav.Link
-                  onClick={() => dispatch(loginL1AccountAsync())}
-                  className="px-2 my-2 py-0"
-                >
-                  Connect Wallet
-                </Nav.Link>
-              </>
-            )}
-            {account && !l2account && (
-              <>
-                <div className="divider"></div>
-                <Nav.Link
-                  onClick={() => dispatch(loginL2AccountAsync(account!))}
-                  className="px-2 my-2 py-0"
-                >
-                  Derive Processing Key
-                </Nav.Link>
               </>
             )}
 
